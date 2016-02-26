@@ -14,9 +14,9 @@ import json  #jaaaaaaaaason
 
 
 #this small script grabs the temp for where the thermostats are located:raleigh, nc
-#weather underground key:131beb0f35b8df99
+#weather underground key:********************
 #wunderground gives nice json! examples can be found on their website.  most of this script is directly from their website.
-f = urllib2.urlopen('http://api.wunderground.com/api/131beb0f35b8df99/geolookup/conditions/q/27606.json')
+f = urllib2.urlopen('http://api.wunderground.com/api/*****************/geolookup/conditions/q/27606.json')
 json_string = f.read()
 parsed_json = json.loads(json_string)
 temp_f = parsed_json['current_observation']['temp_f']
@@ -26,9 +26,9 @@ f.close()
 
 #logging into the mysql server
 db = MySQLdb.connect(host="localhost",
-                     user="monitor",
-                     passwd="********",
-                     db="Temps")
+                     user="Monitor",
+                     passwd="******************",
+                     db="Monitor")
 
 cur = db.cursor()  #setting the cursor for the sql database
 

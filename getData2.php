@@ -1,42 +1,26 @@
-<?php $con=mysql_connect("localhost","monitor","Caroline") or die("Failed to connect with database!!!!");
-mysql_select_db("Temps", $con); 
+<?php $con=mysql_connect("localhost","Monitor","*************") or die("Failed to connect with database!!!!");
+mysql_select_db("Monitor", $con); 
 
 //now we're logged onto mysql, selected the Temps db
 
-//this will grab the query string and we'll do something with it later
-//$uh = $_SERVER['QUERY_STRING'];
-
-
-//echo $uh;
 
 date_default_timezone_set('EST');
-	//for the day query
-	//echo date("Y-m-d");
-	
-	$querytime = date("Y-m-d", strtotime( '-1 days' ) );
-	
-	//echo date("Y-m-d", strtotime( '-1 days' ) );
 
 
 
 //echo $_SERVER['QUERY_STRING'];
 $where = $_GET['where'];
-$when = $_GET['when'];
+$startdate = $_GET['startd'];
+$endate = $_GET['endd'];
 
-if ($when == 'yest') {
-	$timehelp = '-1';
-} 
-else {
-	$timehelp='0';
+if ($startdate == $endate) {
+	$querytime = $endate;
+    //the sql server query
+    $MySqlStr = "SELECT * FROM tempdat WHERE Zone='" . $where . "' AND Date='" . $querytime . "'";
+} else {
+    //the sql server query
+    $MySqlStr = "SELECT * FROM tempdat WHERE Zone='" . $where . "' AND Date between '" . $startdate . "' and '" . $endate . "'";
 }
-//echo $timehelp;
-$querytime = date("Y-m-d", strtotime( $timehelp . ' days' ) );
-
-//echo $querytime;
-
-//the sql server query
-$MySqlStr = "SELECT * FROM tempdat WHERE Zone='" . $where . "' AND Date='" . $querytime . "'";
-
 
 
 $sth = mysql_query($MySqlStr);
@@ -54,8 +38,8 @@ Date	Time	Zone	Temp	State	FanS  Outside Commanded
 $table=array();
 
 $table['cols']=array(
-        array('label'=> 'Date', type=>'string'),
-        array('label'=> 'Time', type=>'string'),
+        array('label'=> 'Date', type=>'date'),
+        array('label'=> 'Time', type=>'datetime'),
         array('label'=> 'Zone', type=>'number'),
         array('label'=> 'Temp', type=>'number'),
 		array('label'=> 'State', type=>'number'),
@@ -68,8 +52,29 @@ $rows=array();
 while($r=mysql_fetch_assoc($sth)){
         $temp=array();
         $temp[]=array('v' => $r['Date']);
-        $temp[]=array('v' => $r['Time']);
-        $temp[]=array('v' => $r['Zone']);
+		
+		//for google charts "datetime" which looks like the string 
+		//"Date(Year, Month, Day, Hours, Minutes, Seconds, Milliseconds)"
+		
+		$datearr = explode("-", $r['Date']);
+		$timearr = explode(":", $r['Time']);
+		$datetimer = "Date(" . $datearr[0] . "," . $datearr[1] . "," . $datearr[2] . "," . $timearr[0] . "," . $timearr[1] . "," . $timearr[2] . ")";
+		//echo $datetimer;
+		
+		$temp[]=array('v' => $datetimer);
+		
+		// For google charts datatype "timeofday"
+		/*
+		$temptime = $r['Time'];
+		$temptimearr = explode(":",$temptime);
+		for ($x = 0; $x <= 2; $x++) {
+			$cheese[$x] =  (int)$temptimearr[$x];
+		}
+        $temp[]=array('v' => $cheese);
+		//end of google charts timeofday
+		*/
+		
+		$temp[]=array('v' => $r['Zone']);
         $temp[]=array('v' => (double) $r['Temperature']);
 		$temp[]=array('v' => (double) $r['Thermostat State']);
 		$temp[]=array('v' => (double) $r['Fan State']);
