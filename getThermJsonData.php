@@ -1,3 +1,4 @@
+<?php $con=mysql_connect("localhost","Monitor","*********") or die("Failed to connect with database!!!!");
 mysql_select_db("Monitor", $con); 
 
 //now we're logged onto mysql, selected the Temps db
