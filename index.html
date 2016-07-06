@@ -27,7 +27,7 @@
         
         .button {
             margin: 0 auto;
-            background-color: #4CAF50; /* Green */
+            background-color: #009900; /* Green */
             border: none;
             border-radius: 4px;
             color: white;
@@ -41,7 +41,7 @@
         }
         
         .button:hover {
-            background-color: #FFFFFF; /* Green */
+            background-color: #4CAF50; /* Green */
             color: green;
         }
         
@@ -50,80 +50,78 @@
             margin:auto;
         }
     </style>
-		<!--Load the AJAX API -->
-		<script type="text/javascript" src="http://www.google.com/jsapi"></script>
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>
-		<!--datething-->
-		<link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
-		<script src="//code.jquery.com/jquery-1.10.2.js"></script>
-		<script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+       
+
+        <!--Load the AJAX API -->
+        <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>
+        <!--datething-->
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+        <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+        <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+
+        <script type="text/javascript">
+
+
+        //Load the visualization API and the packages for charts
+        google.load('visualization', '1', {'packages': ['corechart']});
+
+        //Set my init function (drawitall) to run when the google visualization API is finished loading - this is important as all the functions rely on that API
+        google.setOnLoadCallback(drawitall);
 		
-		<script type="text/javascript">
-		
-		
-		//Load the visualization API and the packages for charts
-		google.load('visualization', '1', {'packages': ['corechart']});
-		
-		//Set my init function (drawitall) to run when the google visualization API is finished loading - this is important as all the functions 
-		//rely on that API
-		google.setOnLoadCallback(drawitall);
-		
-		var view = [];
-		var viewstate = [];
-		var datas1;
-		var datas2;
-		var jsonData, jsonData2;
+        var view = [];
+        var viewstate = [];
+        var datas1;
+        var datas2;
+        var jsonData, jsonData2;
         var displaydate;
-        
+
         var curdate  = new Date();
         curdate = Date.now();
         curdate = formatDate(curdate);
-        
+
         var startdate = curdate;
         var endate = curdate;
-        
-		var helper = "getData2.php?where=Downstairs&startd=" + startdate + "&endd=" + endate;
-		var helper2 = "getData2.php?where=Upstairs&startd=" + startdate + "&endd=" + endate;
+
+        var helper = "getThermJsonData.php?where=Downstairs&startd=" + startdate + "&endd=" + endate;
+        var helper2 = "getThermJsonData.php?where=Upstairs&startd=" + startdate + "&endd=" + endate;
+        var helper3 = "getThermStats.php?startd=" + startdate + "&endd=" + endate;
 		
-		var helper3 = "getStats.php?startd=" + startdate + "&endd=" + endate;
+	
+        function drawitall() {	
 		
-		
-		
-		
-		function drawitall() {	
-		
-			function setdata() {	
-		
-			//getting that jason out using a php script i wrote
-				jsonData = $.ajax({
-					url:helper,
-					dataType:"json",
-					async:false
-				}).responseText;
-			
-				jsonData2 = $.ajax({
-					url:helper2,
-					dataType:"json",
-					async:false
-				}).responseText;
+            function setdata() {	
+
+                //getting that jason out using a php script i wrote
+                jsonData = $.ajax({
+                    url:helper,
+                    dataType:"json",
+                    async:false
+                }).responseText;
+
+                jsonData2 = $.ajax({
+                    url:helper2,
+                    dataType:"json",
+                    async:false
+                }).responseText;
 
                 
                 // Create and populate the data tables.
                 // Also set view windows for my data for different graphs
                 datas1 =  new google.visualization.DataTable(jsonData);
                 datas2 =  new google.visualization.DataTable(jsonData2);
-        
+
                 view[0] = new google.visualization.DataView(datas2);
                 view[1] = new google.visualization.DataView(datas1);
-        
+
                 viewstate[0] = new google.visualization.DataView(datas2);
                 viewstate[1] = new google.visualization.DataView(datas1);
-        
+
                 view[0].setColumns([1, 3, 6, 7]);
                 view[1].setColumns([1, 3, 6, 7]);
                 viewstate[0].setColumns([1, 4]);
                 viewstate[1].setColumns([1, 4]);
-	
+
             }
 
             var options = {
@@ -131,20 +129,18 @@
                 height: 300,
                 vAxis: {title: "Temp"},
                 hAxis: {
-					title: "Time",
-					gridlines: {
-						count: -1,
-						units: {
-							days: {format: ['MMM dd']},
-							hours: {format: ['HH:mm', 'ha']},
-						}
-					},
-				},
+                title: "Time",
+                    gridlines: {
+                        count: -1,
+                            units: {
+                            days: {format: ['MMM dd']},
+                            hours: {format: ['HH:mm', 'ha']},
+                            }
+                        },
+                },
                 
-				crosshair: { trigger: 'both' }, // Display crosshairs on focus and selection.
+                crosshair: { trigger: 'both' }, // Display crosshairs on focus and selection.
 				
-				
-
                 animation:{
                     duration: 1000,
                     easing: 'out'
@@ -159,26 +155,25 @@
             var button2 = document.getElementById('b2');
 	
             function drawChart() {
-              // Disabling the button while the chart is drawing
-              button.disabled = true;
-              button2.disabled = true;
-              google.visualization.events.addListener(chart, 'ready',
-                  function() {
+                // Disabling the button while the chart is drawing
+                button.disabled = true;
+                button2.disabled = true;
+                google.visualization.events.addListener(chart, 'ready',
+                function() {
                     //enable the button when done drawing the temps chart, this one is more complex
                     button.disabled = false;
                     button2.disabled = false;
                     button.value = 'Switch to ' + (current ? 'Upstairs' : 'Downstairs');
-                  });
-              options['title'] = startdate + " to " + endate + (current ? ' Downstairs' : ' Upstairs');
-	 
+                });
+                options['title'] = startdate + " to " + endate + (current ? ' Downstairs' : ' Upstairs');
 
-              chart.draw(view[current], options);  //draw the temps
-              chart2.draw(viewstate[current], options);  //draw the states
+                chart.draw(view[current], options);  //draw the temps
+                chart2.draw(viewstate[current], options);  //draw the states
             }
             
             setdata();  //set the data
             drawChart();  //draw the charts & disable/enable buttons
-			showStats();
+            showStats();
 
             button.onclick = function() {
                 current = 1 - current;
@@ -186,72 +181,68 @@
             }
 	
             button2.onclick = function() {
-            
                 startdate  = new Date();
                 enddate  =  new Date();
-                
+
                 if ($("#datepicker").hasClass('hasDatepicker')) {
                     startdate  = $("#datepicker").datepicker('getDate');
-                     }
+                }
                 if ($("#datepicker2").hasClass('hasDatepicker')) {
                     endate  = $("#datepicker2").datepicker('getDate');
-                    }
+                }
                     
                 startdate = formatDate(startdate);
                 endate = formatDate(endate);
-                
-                helper = "getData2.php?where=Downstairs&startd=" + startdate + "&endd=" + endate;
-                helper2 = "getData2.php?where=Upstairs&startd=" + startdate + "&endd=" + endate;
-				helper3 = "getStats.php?startd=" + startdate + "&endd=" + endate;
-				
+
+                helper = "getThermJsonData.php?where=Downstairs&startd=" + startdate + "&endd=" + endate;
+                helper2 = "getThermJsonData.php?where=Upstairs&startd=" + startdate + "&endd=" + endate;
+                helper3 = "getThermStats.php?startd=" + startdate + "&endd=" + endate;
+
                 setdata();
-				showStats();
+                showStats();
                 drawChart();
-				
             }
         }
 
-		function formatDate(date) {
-			var d = new Date(date),
-				month = '' + (d.getMonth() + 1),
-				day = '' + d.getDate(),
-				year = d.getFullYear();
+        function formatDate(date) {
+            var d = new Date(date),
+                month = '' + (d.getMonth() + 1),
+                day = '' + d.getDate(),
+                year = d.getFullYear();
 
-			if (month.length < 2) month = '0' + month;
-			if (day.length < 2) day = '0' + day;
+            if (month.length < 2) month = '0' + month;
+            if (day.length < 2) day = '0' + day;
 
-			return [year, month, day].join('-');
-		}
+            return [year, month, day].join('-');
+        }
 
-		$(document).ready(function() {
-			$("#datepicker").datepicker({dateFormat: "yy-mm-dd"});
-		});
+        $(document).ready(function() {
+            $("#datepicker").datepicker({dateFormat: "yy-mm-dd"});
+        });
 
-		$(document).ready(function() {
-			$("#datepicker2").datepicker({dateFormat: "yy-mm-dd"});
-		});
+        $(document).ready(function() {
+            $("#datepicker2").datepicker({dateFormat: "yy-mm-dd"});
+        });
 		
-		function showStats() {
-			if (window.XMLHttpRequest) {
-			// code for IE7+, Firefox, Chrome, Opera, Safari
-				xmlhttp=new XMLHttpRequest();
-			} 
-			
-			xmlhttp.onreadystatechange=function() {
-				if (xmlhttp.readyState==4 && xmlhttp.status==200) {
-				  document.getElementById("statdisplay").innerHTML=xmlhttp.responseText;
-				}
-			}
-			
-		  xmlhttp.open("GET",helper3,true);
-		  xmlhttp.send();
-		}
-        
+        function showStats() {
+            if (window.XMLHttpRequest) {
+            // code for IE7+, Firefox, Chrome, Opera, Safari
+                xmlhttp=new XMLHttpRequest();
+            } 
+
+            xmlhttp.onreadystatechange=function() {
+                if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+                  document.getElementById("statdisplay").innerHTML=xmlhttp.responseText;
+                }
+            }
+
+            xmlhttp.open("GET",helper3,true);
+            xmlhttp.send();
+        }
         
         
 
-	
-		</script>
+    </script>
 	</head>
 
 	<body>
@@ -260,13 +251,10 @@
         <form>
             Start Date: <input type="text" name="startdate" id="datepicker"/>
             End Date: <input type="text" name="endate" id="datepicker2"/>
-
         </form>
         <br>
         <div id="SubmitButton"><input type="button"  id="b2" class="button" value="Submit"/></div>
 		<br>
-        
-      
 		<div id="statdisplay"><b>Stats loading...</b></div>
 		<br>
         <div id="switchbutton"><input id="b1" type="button" class="button" value="Switch to Upstairs"></input></div>

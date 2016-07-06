@@ -14,9 +14,8 @@ import json  #jaaaaaaaaason
 
 
 #this small script grabs the temp for where the thermostats are located:raleigh, nc
-#weather underground key:********************
 #wunderground gives nice json! examples can be found on their website.  most of this script is directly from their website.
-f = urllib2.urlopen('http://api.wunderground.com/api/*****************/geolookup/conditions/q/27606.json')
+f = urllib2.urlopen('http://api.wunderground.com/api/***********/geolookup/conditions/q/27606.json')
 json_string = f.read()
 parsed_json = json.loads(json_string)
 temp_f = parsed_json['current_observation']['temp_f']
@@ -27,7 +26,7 @@ f.close()
 #logging into the mysql server
 db = MySQLdb.connect(host="localhost",
                      user="Monitor",
-                     passwd="******************",
+                     passwd="***********",
                      db="Monitor")
 
 cur = db.cursor()  #setting the cursor for the sql database
@@ -41,10 +40,12 @@ def getinfo(ip):
 
     temp = tstat.temp['raw']  #this grabs the raw value of temp from the therm and puts into a float
     FanState = tstat.fstate['raw']  #this grabs the raw value of fan on or off
-    ThermState = tstat.tstate['raw']  #this grabs raw value of thermostat commanding cool, heat, off
+    ThermState = tstat.tstate['raw']  #this grabs raw value of thermostat state -if it is commanding cool, heat,or off
     tname = tstat.name['raw']  #name of thermostat given by the radio thermostat company
+    ThermMode = tstat.tmode['raw'] #current mode: cool, heat or off.
+	
 
-    if (ThermState == 2):
+    if (ThermMode == 2):
         comm = tstat.t_cool['raw']  #commanded temp, not sure the difference b/w t_cool and it_cool
     else:
         comm = tstat.t_heat['raw']  #commanded temp for heat
@@ -53,38 +54,25 @@ def getinfo(ip):
 
 
 def writeinfo(dict):
-    try:
-        cur.execute("INSERT INTO tempdat VALUES (CURDATE(),NOW(),%s,%s,%s,%s,%s,%s)",
-                    (dict['ThermName'], dict['temp'], dict['ThermState'], dict['FanState'], temp_f, dict['comm']))
+    if (dict['temp'] > 0):
+		try:
+			cur.execute("INSERT INTO tempdat VALUES (CURDATE(),NOW(),%s,%s,%s,%s,%s,%s)",
+						(dict['ThermName'], dict['temp'], dict['ThermState'], dict['FanState'], temp_f, dict['comm']))
 
-        db.commit()
-        print "\nData Committed!", dict['ThermName']
+			db.commit()
+			print "\nData Committed!", dict['ThermName']
 
-    except:
-        print "Error in committing, rolling back!"
-        db.rollback()
+		except:
+			print "Error in committing, rolling back!"
+			db.rollback()
 
 
 
 
 
 #these IPs are internal LAN addresses that won't change.  I've set them up as static in my router.  
-#The database entries will automatically know which is downstairs and upstairs
-#it's really too bad python doesn't have constants (define in C)
 writeinfo(getinfo('192.168.0.13'))
 writeinfo(getinfo('192.168.0.9'))
-
-#this was for tshooting/seeing the database grow, too big now!  =P
-
-#cur.execute ("SELECT * FROM tempdat")
-
-#print "\nDate     	Time		Zone		Temperature	ThermState	FanState	Outside	Commanded"
-#print "============================================================================================"
-
-#for reading in cur.fetchall():
-#print str(reading[0])+"	"+str(reading[1])+" 	"+\
-#	reading[2]+"  	"+str(reading[3])+" 		"+str(reading[4])+" 		"+ str(reading[5])+"	"+str(reading[6])+"	"+str(reading[7])
-
 
 
 db.close()
